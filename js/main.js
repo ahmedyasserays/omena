@@ -1113,7 +1113,402 @@ if (document.querySelector('.scroll-indicator')) {
 }
 
 // ================================
+// FEATURED WORK ANIMATIONS
+// ================================
+
+// Animate featured projects on scroll
+gsap.utils.toArray('.featured-project').forEach((project, index) => {
+    const media = project.querySelector('.project-media');
+    const content = project.querySelector('.project-content');
+    const number = project.querySelector('.project-number');
+    const category = project.querySelector('.project-category');
+    const title = project.querySelector('.project-title');
+    const description = project.querySelector('.project-description');
+    const stats = project.querySelectorAll('.stat-box');
+    const cta = project.querySelector('.project-cta');
+    const bgImage = project.querySelector('.project-bg-image');
+
+    // Create reveal animation timeline
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: project,
+            start: 'top 80%',
+            end: 'top 20%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+
+    // Animate media entrance
+    tl.from(media, {
+        x: project.classList.contains('alternate') ? 100 : -100,
+        opacity: 0,
+        duration: 1.2,
+        ease: 'power3.out'
+    }, 0);
+
+    // Animate content entrance
+    tl.from(content, {
+        x: project.classList.contains('alternate') ? -100 : 100,
+        opacity: 0,
+        duration: 1.2,
+        ease: 'power3.out'
+    }, 0);
+
+    // Stagger content elements
+    tl.from([number, category, title, description], {
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power3.out'
+    }, 0.3);
+
+    // Animate stats
+    tl.from(stats, {
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.5)'
+    }, 0.6);
+
+    // Animate CTA
+    tl.from(cta, {
+        scale: 0.8,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'back.out(1.5)'
+    }, 0.8);
+
+    // Parallax effect on image
+    gsap.to(bgImage, {
+        y: 100,
+        scrollTrigger: {
+            trigger: project,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1
+        }
+    });
+
+    // 3D tilt on mouse move
+    project.addEventListener('mousemove', (e) => {
+        const rect = project.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = (y - centerY) / 50;
+        const rotateY = (centerX - x) / 50;
+
+        gsap.to(content, {
+            duration: 0.5,
+            rotationX: rotateX,
+            rotationY: rotateY,
+            transformPerspective: 1000,
+            ease: 'power2.out'
+        });
+    });
+
+    project.addEventListener('mouseleave', () => {
+        gsap.to(content, {
+            duration: 0.8,
+            rotationX: 0,
+            rotationY: 0,
+            ease: 'elastic.out(1, 0.3)'
+        });
+    });
+});
+
+// Stat value counter animation
+gsap.utils.toArray('.stat-box').forEach(stat => {
+    const valueElement = stat.querySelector('.stat-value');
+    const text = valueElement.textContent;
+
+    // Extract number from text (handles 300%, 10x, 2.5M, etc.)
+    const match = text.match(/[\d.]+/);
+    if (match) {
+        const number = parseFloat(match[0]);
+        const suffix = text.replace(/[\d.]+/, '');
+
+        ScrollTrigger.create({
+            trigger: stat,
+            start: 'top 80%',
+            onEnter: () => {
+                gsap.from({ val: 0 }, {
+                    val: number,
+                    duration: 2,
+                    ease: 'power2.out',
+                    onUpdate: function() {
+                        const currentVal = this.targets()[0].val;
+                        const formatted = number % 1 === 0
+                            ? Math.ceil(currentVal)
+                            : currentVal.toFixed(1);
+                        valueElement.textContent = formatted + suffix;
+                    }
+                });
+            },
+            once: true
+        });
+    }
+});
+
+// ================================
+// HORIZONTAL SCROLL ANIMATIONS
+// ================================
+
+if (document.querySelector('.horizontal-projects')) {
+    const horizontalSection = document.querySelector('.horizontal-scroll-section');
+    const horizontalProjects = document.querySelector('.horizontal-projects');
+    const hProjects = gsap.utils.toArray('.h-project');
+
+    // Animate horizontal scroll on vertical scroll
+    gsap.to(horizontalProjects, {
+        x: () => -(horizontalProjects.scrollWidth - window.innerWidth + 100),
+        ease: 'none',
+        scrollTrigger: {
+            trigger: horizontalSection,
+            start: 'top top',
+            end: () => `+=${horizontalProjects.scrollWidth}`,
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+        }
+    });
+
+    // Animate each project on entrance
+    hProjects.forEach((project, index) => {
+        gsap.from(project, {
+            scale: 0.8,
+            opacity: 0,
+            rotationY: -45,
+            duration: 0.8,
+            scrollTrigger: {
+                trigger: horizontalSection,
+                start: 'top center',
+                toggleActions: 'play none none reverse'
+            },
+            delay: index * 0.1
+        });
+
+        // 3D hover effect
+        project.addEventListener('mouseenter', () => {
+            gsap.to(project, {
+                z: 50,
+                rotationY: 10,
+                rotationX: 5,
+                duration: 0.4,
+                ease: 'power2.out'
+            });
+        });
+
+        project.addEventListener('mouseleave', () => {
+            gsap.to(project, {
+                z: 0,
+                rotationY: 0,
+                rotationX: 0,
+                duration: 0.6,
+                ease: 'elastic.out(1, 0.5)'
+            });
+        });
+    });
+}
+
+// ================================
+// PROJECT CTA ANIMATIONS
+// ================================
+
+document.querySelectorAll('.project-cta').forEach(button => {
+    // Pulse animation
+    gsap.to(button, {
+        scale: 1.05,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+    });
+
+    // Enhanced hover effect
+    button.addEventListener('mouseenter', () => {
+        gsap.to(button, {
+            scale: 1.1,
+            boxShadow: '0 30px 60px rgba(39, 40, 96, 0.4)',
+            duration: 0.3
+        });
+    });
+
+    button.addEventListener('mouseleave', () => {
+        gsap.to(button, {
+            scale: 1,
+            boxShadow: '0 10px 30px rgba(39, 40, 96, 0.2)',
+            duration: 0.3
+        });
+    });
+
+    // Click animation
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // Create ripple effect
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+        ripple.style.pointerEvents = 'none';
+
+        button.appendChild(ripple);
+
+        gsap.to(ripple, {
+            scale: 4,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.out',
+            onComplete: () => ripple.remove()
+        });
+    });
+});
+
+// ================================
+// PROJECT NUMBER PARALLAX
+// ================================
+
+gsap.utils.toArray('.project-number').forEach(number => {
+    gsap.to(number, {
+        y: -50,
+        opacity: 0.1,
+        scrollTrigger: {
+            trigger: number,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1
+        }
+    });
+});
+
+// ================================
+// ENHANCED PORTFOLIO GRID ANIMATIONS
+// ================================
+
+// Re-animate portfolio items with more dramatic effects
+gsap.utils.toArray('.portfolio-item').forEach((item, index) => {
+    const image = item.querySelector('.portfolio-image');
+    const info = item.querySelector('.portfolio-info');
+
+    // Entrance animation
+    gsap.from(item, {
+        y: 100,
+        rotationX: -30,
+        opacity: 0,
+        duration: 1,
+        scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        },
+        delay: (index % 3) * 0.1
+    });
+
+    // Image reveal animation
+    gsap.from(image, {
+        scale: 1.2,
+        duration: 1.5,
+        scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+
+    // 3D hover effect
+    item.addEventListener('mouseenter', () => {
+        gsap.to(item, {
+            z: 60,
+            rotationY: 8,
+            rotationX: 5,
+            scale: 1.05,
+            duration: 0.5,
+            ease: 'power3.out'
+        });
+
+        gsap.to(image, {
+            scale: 1.1,
+            duration: 0.6
+        });
+    });
+
+    item.addEventListener('mouseleave', () => {
+        gsap.to(item, {
+            z: 0,
+            rotationY: 0,
+            rotationX: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: 'elastic.out(1, 0.5)'
+        });
+
+        gsap.to(image, {
+            scale: 1,
+            duration: 0.6
+        });
+    });
+});
+
+// ================================
+// MAGNETIC EFFECT FOR PROJECT CARDS
+// ================================
+
+gsap.utils.toArray('.featured-project').forEach(project => {
+    const cta = project.querySelector('.project-cta');
+
+    project.addEventListener('mousemove', (e) => {
+        const rect = cta.getBoundingClientRect();
+        const ctaCenterX = rect.left + rect.width / 2;
+        const ctaCenterY = rect.top + rect.height / 2;
+
+        const distance = Math.sqrt(
+            Math.pow(e.clientX - ctaCenterX, 2) +
+            Math.pow(e.clientY - ctaCenterY, 2)
+        );
+
+        if (distance < 150) {
+            const angle = Math.atan2(e.clientY - ctaCenterY, e.clientX - ctaCenterX);
+            const pullStrength = (150 - distance) / 150;
+            const moveX = Math.cos(angle) * pullStrength * 20;
+            const moveY = Math.sin(angle) * pullStrength * 20;
+
+            gsap.to(cta, {
+                x: moveX,
+                y: moveY,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
+        }
+    });
+
+    project.addEventListener('mouseleave', () => {
+        gsap.to(cta, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: 'elastic.out(1, 0.5)'
+        });
+    });
+});
+
+// ================================
 // Console message
 // ================================
 console.log('%c🎨 OMENA - Creative Agency', 'color: #272860; font-size: 20px; font-weight: bold;');
 console.log('%cWebsite built with GSAP 3D animations', 'color: #666; font-size: 12px;');
+console.log('%c✨ Featuring stunning immersive work showcases', 'color: #f8e800; font-size: 12px;');
