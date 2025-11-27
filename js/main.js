@@ -798,7 +798,322 @@ gsap.utils.toArray('h2, h3').forEach(heading => {
 });
 
 // ================================
+// 3D TILT EFFECT ON MOUSE MOVE
+// ================================
+const tiltElements = document.querySelectorAll('.service-card, .story-card, .value-card, .portfolio-item');
+
+tiltElements.forEach(element => {
+    element.addEventListener('mousemove', (e) => {
+        const rect = element.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+
+        gsap.to(element, {
+            duration: 0.3,
+            rotationX: rotateX,
+            rotationY: rotateY,
+            transformPerspective: 1000,
+            ease: 'power2.out'
+        });
+    });
+
+    element.addEventListener('mouseleave', () => {
+        gsap.to(element, {
+            duration: 0.5,
+            rotationX: 0,
+            rotationY: 0,
+            ease: 'elastic.out(1, 0.3)'
+        });
+    });
+});
+
+// ================================
+// 3D PARALLAX HERO WITH MOUSE TRACKING
+// ================================
+if (document.querySelector('.hero')) {
+    const hero = document.querySelector('.hero');
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    const heroButtons = document.querySelector('.hero-cta');
+    const shapes = document.querySelectorAll('.shape');
+
+    hero.addEventListener('mousemove', (e) => {
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+
+        const xPercent = (clientX / innerWidth - 0.5) * 2;
+        const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+        // Move title
+        gsap.to(heroTitle, {
+            x: xPercent * 30,
+            y: yPercent * 30,
+            rotationY: xPercent * 5,
+            rotationX: -yPercent * 5,
+            duration: 0.5,
+            ease: 'power2.out'
+        });
+
+        // Move subtitle
+        gsap.to(heroSubtitle, {
+            x: xPercent * 20,
+            y: yPercent * 20,
+            duration: 0.5,
+            ease: 'power2.out'
+        });
+
+        // Move buttons
+        gsap.to(heroButtons, {
+            x: xPercent * 15,
+            y: yPercent * 15,
+            duration: 0.5,
+            ease: 'power2.out'
+        });
+
+        // Move shapes with different speeds
+        shapes.forEach((shape, index) => {
+            const speed = (index + 1) * 10;
+            gsap.to(shape, {
+                x: xPercent * speed,
+                y: yPercent * speed,
+                rotationZ: xPercent * (index + 1) * 5,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+        });
+    });
+}
+
+// ================================
+// 3D SCROLL PERSPECTIVE ANIMATIONS
+// ================================
+
+// Add 3D rotation on scroll for service cards
+gsap.utils.toArray('.service-card').forEach((card, index) => {
+    gsap.to(card, {
+        rotationY: 15,
+        rotationX: 5,
+        scrollTrigger: {
+            trigger: card,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 2,
+            onEnter: () => {
+                gsap.to(card, {
+                    scale: 1,
+                    opacity: 1,
+                    duration: 0.5
+                });
+            }
+        }
+    });
+});
+
+// 3D rotate process steps on scroll
+gsap.utils.toArray('.process-step').forEach((step, index) => {
+    gsap.to(step, {
+        rotationY: index % 2 === 0 ? 10 : -10,
+        scrollTrigger: {
+            trigger: step,
+            start: 'top 80%',
+            end: 'bottom 20%',
+            scrub: 1
+        }
+    });
+});
+
+// ================================
+// 3D DEPTH LAYERING FOR SECTIONS
+// ================================
+gsap.utils.toArray('.section').forEach(section => {
+    const elements = section.querySelectorAll('h2, h3, p, .service-card, .story-card');
+
+    elements.forEach((element, index) => {
+        gsap.to(element, {
+            z: index * 20,
+            scrollTrigger: {
+                trigger: section,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1
+            }
+        });
+    });
+});
+
+// ================================
+// 3D ROTATING GEOMETRIC SHAPES
+// ================================
+if (document.querySelector('.floating-shapes')) {
+    gsap.to('.shape-1', {
+        rotationX: 360,
+        rotationY: 360,
+        duration: 25,
+        repeat: -1,
+        ease: 'none'
+    });
+
+    gsap.to('.shape-2', {
+        rotationX: -360,
+        rotationZ: 360,
+        duration: 20,
+        repeat: -1,
+        ease: 'none'
+    });
+
+    gsap.to('.shape-3', {
+        rotationY: 360,
+        rotationZ: -360,
+        duration: 30,
+        repeat: -1,
+        ease: 'none'
+    });
+}
+
+// ================================
+// 3D TEXT REVEAL ANIMATIONS
+// ================================
+gsap.utils.toArray('.section-title').forEach(title => {
+    const chars = title.textContent.split('');
+    title.innerHTML = chars.map(char =>
+        `<span style="display: inline-block;">${char === ' ' ? '&nbsp;' : char}</span>`
+    ).join('');
+
+    const charElements = title.querySelectorAll('span');
+
+    gsap.from(charElements, {
+        opacity: 0,
+        rotationX: -90,
+        y: 50,
+        z: -100,
+        stagger: 0.02,
+        duration: 0.8,
+        ease: 'back.out(1.7)',
+        scrollTrigger: {
+            trigger: title,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+});
+
+// ================================
+// 3D HOVER EFFECT FOR STATS
+// ================================
+document.querySelectorAll('.stat-item').forEach(stat => {
+    stat.addEventListener('mouseenter', () => {
+        gsap.to(stat, {
+            z: 50,
+            scale: 1.1,
+            rotationY: 5,
+            duration: 0.4,
+            ease: 'power2.out'
+        });
+
+        gsap.to(stat.querySelector('.stat-number'), {
+            scale: 1.2,
+            color: '#f8e800',
+            duration: 0.3
+        });
+    });
+
+    stat.addEventListener('mouseleave', () => {
+        gsap.to(stat, {
+            z: 0,
+            scale: 1,
+            rotationY: 0,
+            duration: 0.4,
+            ease: 'elastic.out(1, 0.5)'
+        });
+
+        gsap.to(stat.querySelector('.stat-number'), {
+            scale: 1,
+            color: '#FFFFFF',
+            duration: 0.3
+        });
+    });
+});
+
+// ================================
+// 3D CARD STACK EFFECT ON SCROLL
+// ================================
+gsap.utils.toArray('.story-card').forEach((card, index) => {
+    gsap.to(card, {
+        rotationX: -10,
+        z: index * 30,
+        scrollTrigger: {
+            trigger: card,
+            start: 'top bottom',
+            end: 'top center',
+            scrub: 1
+        }
+    });
+});
+
+// ================================
+// 3D PERSPECTIVE SHIFT ON SCROLL
+// ================================
+ScrollTrigger.create({
+    trigger: 'body',
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate: (self) => {
+        const progress = self.progress;
+        gsap.to('.hero-content', {
+            rotationX: progress * 5,
+            z: progress * 100,
+            duration: 0.3
+        });
+    }
+});
+
+// ================================
+// 3D BUTTON PRESS EFFECT
+// ================================
+document.querySelectorAll('.btn-primary, .btn-secondary, .cta-button').forEach(button => {
+    button.addEventListener('mousedown', () => {
+        gsap.to(button, {
+            scaleX: 0.95,
+            scaleY: 0.95,
+            z: -10,
+            duration: 0.1
+        });
+    });
+
+    button.addEventListener('mouseup', () => {
+        gsap.to(button, {
+            scaleX: 1,
+            scaleY: 1,
+            z: 0,
+            duration: 0.2,
+            ease: 'elastic.out(1, 0.3)'
+        });
+    });
+});
+
+// ================================
+// 3D FLOATING SCROLL INDICATOR
+// ================================
+if (document.querySelector('.scroll-indicator')) {
+    gsap.to('.scroll-indicator', {
+        y: 15,
+        rotationX: 10,
+        z: 20,
+        duration: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power1.inOut'
+    });
+}
+
+// ================================
 // Console message
 // ================================
-console.log('%c🎨 OMENA - Creative Agency', 'color: #FF6B35; font-size: 20px; font-weight: bold;');
-console.log('%cWebsite built with GSAP animations', 'color: #666; font-size: 12px;');
+console.log('%c🎨 OMENA - Creative Agency', 'color: #272860; font-size: 20px; font-weight: bold;');
+console.log('%cWebsite built with GSAP 3D animations', 'color: #666; font-size: 12px;');
