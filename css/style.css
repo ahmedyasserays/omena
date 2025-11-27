@@ -14,14 +14,14 @@
 
 :root {
     /* Primary Brand Colors */
-    --primary-color: #FF6B35;        /* Main brand color - Change this! */
-    --primary-dark: #E55A2B;         /* Darker shade of primary */
-    --primary-light: #FF8C5E;        /* Lighter shade of primary */
+    --primary-color: #272860;        /* Main brand color - Deep Blue/Purple */
+    --primary-dark: #1a1d40;         /* Darker shade of primary */
+    --primary-light: #3d3d7a;        /* Lighter shade of primary */
 
     /* Secondary Colors */
-    --secondary-color: #004E89;      /* Accent color - Change this! */
-    --secondary-dark: #003A68;
-    --secondary-light: #1A6DAA;
+    --secondary-color: #f8e800;      /* Accent color - Bright Yellow */
+    --secondary-dark: #d4c500;
+    --secondary-light: #fff44d;
 
     /* Neutral Colors */
     --dark: #1A1A1A;
@@ -364,8 +364,9 @@ p {
     justify-content: center;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #FFF5F2 0%, #FFE8E0 100%);
+    background: linear-gradient(135deg, #e8e8f5 0%, #f0f0f8 100%);
     padding-top: 100px;
+    perspective: 1000px;
 }
 
 .hero-bg {
@@ -892,10 +893,11 @@ p {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: linear-gradient(135deg, #FFF5F2 0%, #FFE8E0 100%);
+    background: linear-gradient(135deg, #e8e8f5 0%, #f0f0f8 100%);
     position: relative;
     overflow: hidden;
     padding-top: 100px;
+    perspective: 1000px;
 }
 
 .page-title {
@@ -1541,6 +1543,244 @@ p {
     .contact-form-wrapper {
         padding: 2rem 1.5rem;
     }
+}
+
+/* ================================
+   3D ANIMATION STYLES
+   ================================ */
+
+/* 3D Card Container */
+.service-card,
+.story-card,
+.value-card,
+.package-card,
+.testimonial-card {
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 3D Hover Effect */
+.service-card:hover,
+.value-card:hover {
+    transform: translateY(-20px) rotateX(5deg) rotateY(5deg);
+    box-shadow: 0 25px 50px rgba(39, 40, 96, 0.3);
+}
+
+.story-card:hover,
+.package-card:hover {
+    transform: translateY(-15px) rotateX(3deg);
+    box-shadow: 0 20px 40px rgba(39, 40, 96, 0.25);
+}
+
+/* 3D Depth Layers */
+.hero-content {
+    transform-style: preserve-3d;
+}
+
+.hero-title {
+    transform: translateZ(50px);
+}
+
+.hero-subtitle {
+    transform: translateZ(30px);
+}
+
+.hero-cta {
+    transform: translateZ(40px);
+}
+
+/* 3D Rotating Shapes */
+.shape {
+    transform-style: preserve-3d;
+    animation: rotate3d 20s infinite ease-in-out;
+}
+
+@keyframes rotate3d {
+    0%, 100% {
+        transform: rotate3d(1, 1, 1, 0deg);
+    }
+    25% {
+        transform: rotate3d(1, 1, 1, 90deg) translateZ(50px);
+    }
+    50% {
+        transform: rotate3d(1, 1, 1, 180deg) translateZ(100px);
+    }
+    75% {
+        transform: rotate3d(1, 1, 1, 270deg) translateZ(50px);
+    }
+}
+
+/* 3D Perspective Sections */
+.section {
+    transform-style: preserve-3d;
+}
+
+/* 3D Text Effect */
+.section-title {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+/* 3D Button Effects */
+.btn-primary,
+.btn-secondary {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateZ(10px) scale(1.05);
+}
+
+/* 3D Process Steps */
+.process-step {
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+.process-step:hover {
+    transform: translateZ(30px) rotateY(5deg);
+}
+
+.step-number {
+    transform: translateZ(20px);
+    transition: transform 0.3s ease;
+}
+
+.process-step:hover .step-number {
+    transform: translateZ(40px) scale(1.1);
+}
+
+/* 3D Stat Items */
+.stat-item {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateZ(20px) scale(1.05);
+}
+
+.stat-number {
+    transform: translateZ(15px);
+}
+
+/* 3D Portfolio Items */
+.portfolio-item {
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.portfolio-item:hover {
+    transform: translateY(-20px) rotateX(8deg) scale(1.02);
+}
+
+/* 3D Floating Animation */
+@keyframes float3d {
+    0%, 100% {
+        transform: translateY(0) translateZ(0) rotateX(0deg);
+    }
+    50% {
+        transform: translateY(-20px) translateZ(30px) rotateX(5deg);
+    }
+}
+
+.floating-3d {
+    animation: float3d 4s ease-in-out infinite;
+}
+
+/* 3D Parallax Container */
+.parallax-container {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* 3D Card Flip Effect */
+.card-flip {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-flip:hover {
+    transform: rotateY(10deg) rotateX(5deg);
+}
+
+/* 3D Tilt Effect on Mouse Move (will be enhanced with JS) */
+.tilt-3d {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease-out;
+}
+
+/* 3D Layer Separation */
+.layer-3d {
+    transform-style: preserve-3d;
+}
+
+.layer-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    transform: translateZ(-10px);
+    opacity: 0.5;
+    filter: blur(5px);
+}
+
+/* 3D Box Shadow */
+.shadow-3d {
+    box-shadow:
+        0 1px 0 rgba(39, 40, 96, 0.1),
+        0 2px 0 rgba(39, 40, 96, 0.09),
+        0 4px 0 rgba(39, 40, 96, 0.08),
+        0 8px 0 rgba(39, 40, 96, 0.07),
+        0 16px 20px rgba(39, 40, 96, 0.15);
+}
+
+/* 3D Perspective Text */
+.text-3d {
+    transform-style: preserve-3d;
+    text-shadow:
+        1px 1px 0 rgba(39, 40, 96, 0.1),
+        2px 2px 0 rgba(39, 40, 96, 0.09),
+        3px 3px 0 rgba(39, 40, 96, 0.08),
+        4px 4px 10px rgba(39, 40, 96, 0.2);
+}
+
+/* 3D Rotating Elements */
+.rotate-3d-slow {
+    animation: rotateY360 30s linear infinite;
+}
+
+.rotate-3d-fast {
+    animation: rotateY360 15s linear infinite;
+}
+
+@keyframes rotateY360 {
+    from {
+        transform: rotateY(0deg) translateZ(20px);
+    }
+    to {
+        transform: rotateY(360deg) translateZ(20px);
+    }
+}
+
+/* 3D Pulse Effect */
+@keyframes pulse3d {
+    0%, 100% {
+        transform: scale(1) translateZ(0);
+    }
+    50% {
+        transform: scale(1.05) translateZ(20px);
+    }
+}
+
+.pulse-3d {
+    animation: pulse3d 2s ease-in-out infinite;
 }
 
 /* ================================
