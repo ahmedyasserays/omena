@@ -156,6 +156,22 @@ The website includes these stunning animations:
 - **Stat Counters**: Animated counting for project metrics
 - **Ripple Effects**: Interactive ripple on button clicks
 
+### Reality-Bending Dimensional Effects 🌌
+- **Portal Opening**: Expanding circular gradient portal when entering work section
+- **Circular Reveals**: Projects reveal through expanding circles (clip-path animation)
+- **Explosive Particles**: 30+ particles explode outward on project reveal
+- **Vortex Scroll**: Concentric rings appear during fast scrolling
+- **Reality Distortion Grid**: Pulsing perspective grid overlay
+- **Dimensional Shifts**: Previous sections warp away as you scroll to new ones
+- **Color Shifting**: Hue and saturation shift as you scroll through projects
+- **Fragment Effects**: Crystalline shatter overlay on hover
+- **Floating Particles**: 15 particles float up on project hover
+- **Star Field**: 100 twinkling stars with mouse parallax
+- **Energy Waves**: Horizontal energy waves on fast scrolling
+- **Liquid Distortion**: Wave/skew effects on horizontal scroll items
+- **Depth Layers**: Multi-layer 3D depth with translateZ
+- **Breathing Effect**: Subtle scale pulse on entire page
+
 ## 🔧 Dependencies
 
 The website uses these libraries (loaded from CDN):
