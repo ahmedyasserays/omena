@@ -1011,15 +1011,15 @@ if (document.querySelector('.hero')) {
     createHeroParticles();
 
     // ================================
-    // HERO PULSING GLOW ORBS
+    // HERO LIQUID BLOB ORBS
     // ================================
     function createGlowOrbs() {
-        const orbCount = 5;
+        const orbCount = 6;
         for (let i = 0; i < orbCount; i++) {
             const orb = document.createElement('div');
             orb.className = `hero-glow-orb ${i % 2 === 0 ? 'primary' : 'secondary'}`;
 
-            const size = 200 + Math.random() * 300;
+            const size = 250 + Math.random() * 350;
             const x = Math.random() * 100;
             const y = Math.random() * 100;
 
@@ -1033,17 +1033,47 @@ if (document.querySelector('.hero')) {
 
             hero.appendChild(orb);
 
-            // Slow floating animation
+            // Create morphing blob animation
+            const morphTimeline = gsap.timeline({ repeat: -1 });
+
+            // Generate random blob shapes
+            const shapes = [
+                '60% 40% 30% 70% / 60% 30% 70% 40%',
+                '30% 60% 70% 40% / 50% 60% 30% 60%',
+                '50% 50% 50% 50% / 50% 50% 50% 50%',
+                '70% 30% 50% 50% / 30% 50% 50% 60%',
+                '40% 60% 60% 40% / 60% 40% 60% 40%'
+            ];
+
+            shapes.forEach((shape, index) => {
+                morphTimeline.to(orb, {
+                    borderRadius: shape,
+                    duration: 4,
+                    ease: 'sine.inOut'
+                }, index * 4);
+            });
+
+            // Floating animation with rotation
             gsap.to(orb, {
-                x: (Math.random() - 0.5) * 200,
-                y: (Math.random() - 0.5) * 200,
-                duration: 15 + Math.random() * 10,
+                x: `+=${(Math.random() - 0.5) * 300}`,
+                y: `+=${(Math.random() - 0.5) * 300}`,
+                rotation: 360,
+                duration: 20 + Math.random() * 15,
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut'
             });
 
-            // Mouse parallax for orbs
+            // Scale pulsing
+            gsap.to(orb, {
+                scale: 0.9 + Math.random() * 0.3,
+                duration: 5 + Math.random() * 3,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            // Mouse parallax for orbs with liquid feel
             hero.addEventListener('mousemove', (e) => {
                 const { clientX, clientY } = e;
                 const { innerWidth, innerHeight } = window;
@@ -1052,10 +1082,10 @@ if (document.querySelector('.hero')) {
 
                 const depth = (i + 1) / orbCount;
                 gsap.to(orb, {
-                    x: `+=${xPercent * depth * 40}`,
-                    y: `+=${yPercent * depth * 40}`,
-                    duration: 1,
-                    ease: 'power2.out'
+                    x: `+=${xPercent * depth * 50}`,
+                    y: `+=${yPercent * depth * 50}`,
+                    duration: 1.2,
+                    ease: 'power1.out'
                 });
             });
         }
