@@ -5,7 +5,11 @@ A stunning, professional website built with GSAP animations for the Omena brand 
 ## ✨ Features
 
 - **Stunning GSAP Animations**: Scroll-triggered animations, parallax effects, and smooth transitions
+- **Immersive Work Showcases**: Full-screen featured projects with dramatic reveals and 3D effects
+- **Horizontal Scroll Gallery**: Smooth horizontal scrolling portfolio section with pin animation
 - **Custom Cursor**: Interactive custom cursor with magnetic effects
+- **3D Transformations**: Advanced 3D tilt effects on cards and interactive elements
+- **Magnetic Buttons**: CTAs that react to mouse proximity with magnetic pull effect
 - **Fully Responsive**: Mobile-first design that works on all devices
 - **Multiple Pages**: Home, About, Services, Stories, and Contact pages
 - **Interactive Elements**: Hover effects, smooth scrolling, and dynamic content
@@ -132,6 +136,7 @@ Replace the placeholder images with your actual content:
 
 The website includes these stunning animations:
 
+### General Animations
 - **Scroll Animations**: Elements fade and slide in as you scroll
 - **Parallax Effects**: Images move at different speeds
 - **Custom Cursor**: Interactive cursor that responds to hover
@@ -139,6 +144,33 @@ The website includes these stunning animations:
 - **Counter Animations**: Stats numbers count up when visible
 - **Card Hover Effects**: 3D transforms on service/story cards
 - **Page Transitions**: Smooth transitions between sections
+
+### Featured Work Showcases (Stories Page)
+- **Full-Screen Projects**: Immersive full-viewport project presentations
+- **Split Layouts**: Dynamic alternating layouts for visual variety
+- **3D Tilt Effects**: Mouse-reactive 3D tilting on project cards
+- **Parallax Images**: Background images move independently on scroll
+- **Staggered Reveals**: Content elements animate in sequence
+- **Magnetic CTAs**: Call-to-action buttons attracted to mouse cursor
+- **Horizontal Scroll**: Smooth horizontal scrolling gallery section
+- **Stat Counters**: Animated counting for project metrics
+- **Ripple Effects**: Interactive ripple on button clicks
+
+### Reality-Bending Dimensional Effects 🌌
+- **Portal Opening**: Expanding circular gradient portal when entering work section
+- **Circular Reveals**: Projects reveal through expanding circles (clip-path animation)
+- **Explosive Particles**: 30+ particles explode outward on project reveal
+- **Vortex Scroll**: Concentric rings appear during fast scrolling
+- **Reality Distortion Grid**: Pulsing perspective grid overlay
+- **Dimensional Shifts**: Previous sections warp away as you scroll to new ones
+- **Color Shifting**: Hue and saturation shift as you scroll through projects
+- **Fragment Effects**: Crystalline shatter overlay on hover
+- **Floating Particles**: 15 particles float up on project hover
+- **Star Field**: 100 twinkling stars with mouse parallax
+- **Energy Waves**: Horizontal energy waves on fast scrolling
+- **Liquid Distortion**: Wave/skew effects on horizontal scroll items
+- **Depth Layers**: Multi-layer 3D depth with translateZ
+- **Breathing Effect**: Subtle scale pulse on entire page
 
 ## 🔧 Dependencies
 
