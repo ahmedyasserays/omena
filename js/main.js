@@ -1249,7 +1249,11 @@ window.addEventListener('scroll', () => {
 // FEATURED WORK ANIMATIONS
 // ================================
 
-// Animate featured projects on scroll
+// ================================
+// VARIED REVEAL ANIMATIONS FOR EACH PROJECT
+// ================================
+
+// Animate featured projects on scroll with DIFFERENT animations
 gsap.utils.toArray('.featured-project').forEach((project, index) => {
     const media = project.querySelector('.project-media');
     const content = project.querySelector('.project-content');
@@ -1261,31 +1265,132 @@ gsap.utils.toArray('.featured-project').forEach((project, index) => {
     const cta = project.querySelector('.project-cta');
     const bgImage = project.querySelector('.project-bg-image');
 
-    // Circular reveal effect
-    ScrollTrigger.create({
-        trigger: project,
-        start: 'top 70%',
-        onEnter: () => {
-            project.classList.add('reveal-active');
-            project.classList.add('explode');
-
-            // Create explosion particles
-            setTimeout(() => {
-                createExplosionParticles(project);
-            }, 200);
-
-            // Remove explode class after animation
-            setTimeout(() => {
-                project.classList.remove('explode');
-            }, 1200);
+    // Different reveal animations based on index
+    const revealPatterns = [
+        // Pattern 1: Diagonal wipe
+        () => {
+            gsap.from(project, {
+                clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+                duration: 1.5,
+                ease: 'power4.inOut',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
         },
-        onLeaveBack: () => {
-            project.classList.remove('reveal-active');
+        // Pattern 2: Split from center
+        () => {
+            gsap.from(project, {
+                clipPath: 'polygon(50% 0, 50% 0, 50% 100%, 50% 100%)',
+                duration: 1.2,
+                ease: 'expo.out',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
         },
-        once: false
-    });
+        // Pattern 3: Curtain reveal
+        () => {
+            gsap.from(project, {
+                clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
+                duration: 1.3,
+                ease: 'power3.inOut',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        }
+    ];
 
-    // Create reveal animation timeline
+    // Apply pattern based on index
+    revealPatterns[index % revealPatterns.length]();
+
+    // Explosion effect for first project only
+    if (index === 0) {
+        ScrollTrigger.create({
+            trigger: project,
+            start: 'top 70%',
+            onEnter: () => {
+                project.classList.add('explode');
+                setTimeout(() => {
+                    createExplosionParticles(project);
+                }, 200);
+                setTimeout(() => {
+                    project.classList.remove('explode');
+                }, 1200);
+            },
+            once: true
+        });
+    }
+
+    // Create VARIED content animation timelines based on project index
+    const contentAnimations = [
+        // Animation 1: Spiral in
+        (tl) => {
+            tl.from(media, {
+                scale: 0.5,
+                rotation: -180,
+                opacity: 0,
+                duration: 1.5,
+                ease: 'back.out(1.7)'
+            }, 0);
+
+            tl.from([number, category, title, description], {
+                rotation: 90,
+                x: -100,
+                opacity: 0,
+                duration: 1,
+                stagger: {
+                    each: 0.1,
+                    from: 'end'
+                },
+                ease: 'expo.out'
+            }, 0.5);
+        },
+        // Animation 2: Wave reveal
+        (tl) => {
+            tl.from(media, {
+                clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+                duration: 1.2,
+                ease: 'power4.inOut'
+            }, 0);
+
+            tl.from([number, category, title, description], {
+                y: 100,
+                rotationX: -90,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'back.out(2)'
+            }, 0.6);
+        },
+        // Animation 3: Bounce in
+        (tl) => {
+            tl.from(media, {
+                y: -200,
+                opacity: 0,
+                duration: 1.2,
+                ease: 'bounce.out'
+            }, 0);
+
+            tl.from([number, category, title, description], {
+                scale: 0,
+                rotation: 360,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'elastic.out(1, 0.5)'
+            }, 0.4);
+        }
+    ];
+
+    // Create timeline
     const tl = gsap.timeline({
         scrollTrigger: {
             trigger: project,
@@ -1295,47 +1400,35 @@ gsap.utils.toArray('.featured-project').forEach((project, index) => {
         }
     });
 
-    // Animate media entrance
-    tl.from(media, {
-        x: project.classList.contains('alternate') ? 100 : -100,
-        opacity: 0,
-        duration: 1.2,
-        ease: 'power3.out'
-    }, 0);
+    // Apply animation pattern
+    contentAnimations[index % contentAnimations.length](tl);
 
-    // Animate content entrance
-    tl.from(content, {
-        x: project.classList.contains('alternate') ? -100 : 100,
-        opacity: 0,
-        duration: 1.2,
-        ease: 'power3.out'
-    }, 0);
+    // Animate stats with varied patterns
+    const statAnimations = [
+        { y: -50, opacity: 0, rotation: -45 },
+        { scale: 0, opacity: 0, rotation: 180 },
+        { x: -100, opacity: 0, skewX: 20 }
+    ];
 
-    // Stagger content elements
-    tl.from([number, category, title, description], {
-        y: 50,
-        opacity: 0,
+    tl.from(stats, {
+        ...statAnimations[index % statAnimations.length],
         duration: 0.8,
         stagger: 0.1,
-        ease: 'power3.out'
-    }, 0.3);
-
-    // Animate stats
-    tl.from(stats, {
-        y: 30,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: 'back.out(1.5)'
-    }, 0.6);
-
-    // Animate CTA
-    tl.from(cta, {
-        scale: 0.8,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'back.out(1.5)'
+        ease: 'back.out(2)'
     }, 0.8);
+
+    // Animate CTA with unique effect per project
+    const ctaEffects = [
+        { scale: 0, rotation: 720, opacity: 0 },
+        { y: 100, opacity: 0, rotationX: 90 },
+        { scaleX: 0, opacity: 0, skewY: 10 }
+    ];
+
+    tl.from(cta, {
+        ...ctaEffects[index % ctaEffects.length],
+        duration: 0.8,
+        ease: 'back.out(2)'
+    }, 1);
 
     // Parallax effect on image
     gsap.to(bgImage, {
@@ -1947,10 +2040,121 @@ window.addEventListener('scroll', () => {
 });
 
 // ================================
+// TYPEWRITER EFFECT FOR TITLES
+// ================================
+gsap.utils.toArray('.project-title').forEach((title, index) => {
+    const text = title.textContent;
+    title.textContent = '';
+
+    ScrollTrigger.create({
+        trigger: title,
+        start: 'top 80%',
+        onEnter: () => {
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < text.length) {
+                    title.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 30 + index * 10);
+        },
+        once: true
+    });
+});
+
+// ================================
+// GLITCH EFFECT ON NUMBERS
+// ================================
+gsap.utils.toArray('.project-number').forEach((number, index) => {
+    ScrollTrigger.create({
+        trigger: number,
+        start: 'top 85%',
+        onEnter: () => {
+            // Glitch animation
+            const glitchTl = gsap.timeline();
+            for (let i = 0; i < 5; i++) {
+                glitchTl.to(number, {
+                    x: gsap.utils.random(-10, 10),
+                    y: gsap.utils.random(-10, 10),
+                    opacity: gsap.utils.random(0.3, 1),
+                    duration: 0.05
+                });
+            }
+            glitchTl.to(number, {
+                x: 0,
+                y: 0,
+                opacity: 0.3,
+                duration: 0.2
+            });
+        },
+        once: true
+    });
+});
+
+// ================================
+// BOUNCING STATS REVEAL
+// ================================
+gsap.utils.toArray('.stat-box').forEach((stat, index) => {
+    gsap.from(stat, {
+        y: -100 + gsap.utils.random(-50, 50),
+        rotation: gsap.utils.random(-360, 360),
+        opacity: 0,
+        duration: 1 + index * 0.1,
+        ease: 'bounce.out',
+        scrollTrigger: {
+            trigger: stat,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        },
+        delay: index * 0.15
+    });
+});
+
+// ================================
+// SECTION TRANSITION WIPES
+// ================================
+gsap.utils.toArray('.section').forEach((section, index) => {
+    // Different wipe patterns for each section
+    const wipePatterns = [
+        'polygon(0 0, 100% 0, 100% 100%, 0 100%)', // Full
+        'polygon(0 0, 0 0, 0 100%, 0 100%)',        // Left wipe
+        'polygon(0 0, 100% 0, 100% 0, 0 0)',        // Top wipe
+        'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' // Right wipe
+    ];
+
+    gsap.from(section, {
+        clipPath: wipePatterns[(index + 1) % wipePatterns.length],
+        duration: 1.2,
+        ease: 'power3.inOut',
+        scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+});
+
+// ================================
+// MORPHING SHAPES
+// ================================
+if (document.querySelector('.floating-shapes')) {
+    gsap.to('.shape-1', {
+        morphSVG: 'circle',
+        scale: gsap.utils.wrap([1, 1.5, 0.8]),
+        duration: 8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+    });
+}
+
+// ================================
 // Console message
 // ================================
-console.log('%c🌌 OMENA - Opening Dimensional Portals', 'color: #272860; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #f8e800;');
-console.log('%cWebsite built with GSAP 3D animations', 'color: #666; font-size: 12px;');
-console.log('%c✨ Featuring stunning immersive work showcases', 'color: #f8e800; font-size: 12px;');
-console.log('%c🎆 Reality-bending effects & dimensional transitions', 'color: #272860; font-size: 12px; font-weight: bold;');
-console.log('%c⚡ Explosive reveals, particle systems & vortex scrolling', 'color: #f8e800; font-size: 12px; font-weight: bold;');
+console.log('%c🌌 OMENA - Unique Animation Showcase', 'color: #272860; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #f8e800;');
+console.log('%c✨ Each section has DIFFERENT animations!', 'color: #f8e800; font-size: 14px; font-weight: bold;');
+console.log('%c🎭 Diagonal wipes, spirals, waves, bounces & more', 'color: #272860; font-size: 12px;');
+console.log('%c⚡ Typewriter effects, glitches & morphing shapes', 'color: #f8e800; font-size: 12px;');
+console.log('%c🎨 Asymmetric layouts & reality-bending transitions', 'color: #272860; font-size: 12px; font-weight: bold;');
