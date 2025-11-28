@@ -841,6 +841,7 @@ if (document.querySelector('.hero')) {
     const heroTitle = document.querySelector('.hero-title');
     const heroSubtitle = document.querySelector('.hero-subtitle');
     const heroButtons = document.querySelector('.hero-cta');
+    const heroBg = document.querySelector('.hero-bg');
     const shapes = document.querySelectorAll('.shape');
 
     hero.addEventListener('mousemove', (e) => {
@@ -849,6 +850,20 @@ if (document.querySelector('.hero')) {
 
         const xPercent = (clientX / innerWidth - 0.5) * 2;
         const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+        // Update CSS custom properties for background layers
+        hero.style.setProperty('--mouse-x', xPercent);
+        hero.style.setProperty('--mouse-y', yPercent);
+
+        // Move hero-bg grid
+        if (heroBg) {
+            gsap.to(heroBg, {
+                x: xPercent * 50,
+                y: yPercent * 50,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+        }
 
         // Move title
         gsap.to(heroTitle, {
@@ -888,6 +903,165 @@ if (document.querySelector('.hero')) {
             });
         });
     });
+
+    // Reset on mouse leave
+    hero.addEventListener('mouseleave', () => {
+        hero.style.setProperty('--mouse-x', 0);
+        hero.style.setProperty('--mouse-y', 0);
+
+        if (heroBg) {
+            gsap.to(heroBg, {
+                x: 0,
+                y: 0,
+                duration: 1,
+                ease: 'power2.out'
+            });
+        }
+    });
+
+    // ================================
+    // HERO FLOATING PARTICLES
+    // ================================
+    function createHeroParticles() {
+        const particleCount = 30;
+        const particleContainer = document.createElement('div');
+        particleContainer.className = 'hero-particles';
+        particleContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        `;
+        hero.appendChild(particleContainer);
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            const size = Math.random() * 6 + 2;
+            const startX = Math.random() * 100;
+            const startY = Math.random() * 100;
+            const color = Math.random() > 0.5 ? '#272860' : '#f8e800';
+
+            particle.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                border-radius: 50%;
+                left: ${startX}%;
+                top: ${startY}%;
+                opacity: ${Math.random() * 0.3 + 0.2};
+                box-shadow: 0 0 ${size * 2}px ${color};
+            `;
+
+            particleContainer.appendChild(particle);
+
+            // Animate particle
+            const duration = 10 + Math.random() * 20;
+            const delay = Math.random() * 5;
+            const yMovement = -50 - Math.random() * 50;
+            const xMovement = (Math.random() - 0.5) * 30;
+
+            gsap.to(particle, {
+                y: `${yMovement}vh`,
+                x: `${xMovement}vw`,
+                opacity: 0,
+                duration: duration,
+                delay: delay,
+                repeat: -1,
+                ease: 'none',
+                onRepeat: () => {
+                    // Reset position
+                    gsap.set(particle, {
+                        y: 0,
+                        x: 0,
+                        opacity: Math.random() * 0.3 + 0.2
+                    });
+                }
+            });
+
+            // Add subtle rotation
+            gsap.to(particle, {
+                rotation: 360 * (Math.random() > 0.5 ? 1 : -1),
+                duration: duration,
+                repeat: -1,
+                ease: 'none'
+            });
+
+            // Add parallax effect to particles
+            hero.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+                const xPercent = (clientX / innerWidth - 0.5) * 2;
+                const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+                const depth = (i % 5 + 1) / 5;
+                gsap.to(particle, {
+                    x: `+=${xPercent * depth * 20}`,
+                    y: `+=${yPercent * depth * 20}`,
+                    duration: 0.5,
+                    ease: 'power2.out'
+                });
+            });
+        }
+    }
+
+    createHeroParticles();
+
+    // ================================
+    // HERO PULSING GLOW ORBS
+    // ================================
+    function createGlowOrbs() {
+        const orbCount = 5;
+        for (let i = 0; i < orbCount; i++) {
+            const orb = document.createElement('div');
+            orb.className = `hero-glow-orb ${i % 2 === 0 ? 'primary' : 'secondary'}`;
+
+            const size = 200 + Math.random() * 300;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+
+            orb.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}%;
+                top: ${y}%;
+                animation-delay: ${i * -1.6}s;
+            `;
+
+            hero.appendChild(orb);
+
+            // Slow floating animation
+            gsap.to(orb, {
+                x: (Math.random() - 0.5) * 200,
+                y: (Math.random() - 0.5) * 200,
+                duration: 15 + Math.random() * 10,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            // Mouse parallax for orbs
+            hero.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+                const xPercent = (clientX / innerWidth - 0.5) * 2;
+                const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+                const depth = (i + 1) / orbCount;
+                gsap.to(orb, {
+                    x: `+=${xPercent * depth * 40}`,
+                    y: `+=${yPercent * depth * 40}`,
+                    duration: 1,
+                    ease: 'power2.out'
+                });
+            });
+        }
+    }
+
+    createGlowOrbs();
 }
 
 // ================================
