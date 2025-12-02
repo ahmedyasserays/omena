@@ -841,6 +841,7 @@ if (document.querySelector('.hero')) {
     const heroTitle = document.querySelector('.hero-title');
     const heroSubtitle = document.querySelector('.hero-subtitle');
     const heroButtons = document.querySelector('.hero-cta');
+    const heroBg = document.querySelector('.hero-bg');
     const shapes = document.querySelectorAll('.shape');
 
     hero.addEventListener('mousemove', (e) => {
@@ -849,6 +850,20 @@ if (document.querySelector('.hero')) {
 
         const xPercent = (clientX / innerWidth - 0.5) * 2;
         const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+        // Update CSS custom properties for background layers
+        hero.style.setProperty('--mouse-x', xPercent);
+        hero.style.setProperty('--mouse-y', yPercent);
+
+        // Move hero-bg grid
+        if (heroBg) {
+            gsap.to(heroBg, {
+                x: xPercent * 50,
+                y: yPercent * 50,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+        }
 
         // Move title
         gsap.to(heroTitle, {
@@ -888,6 +903,195 @@ if (document.querySelector('.hero')) {
             });
         });
     });
+
+    // Reset on mouse leave
+    hero.addEventListener('mouseleave', () => {
+        hero.style.setProperty('--mouse-x', 0);
+        hero.style.setProperty('--mouse-y', 0);
+
+        if (heroBg) {
+            gsap.to(heroBg, {
+                x: 0,
+                y: 0,
+                duration: 1,
+                ease: 'power2.out'
+            });
+        }
+    });
+
+    // ================================
+    // HERO FLOATING PARTICLES
+    // ================================
+    function createHeroParticles() {
+        const particleCount = 30;
+        const particleContainer = document.createElement('div');
+        particleContainer.className = 'hero-particles';
+        particleContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        `;
+        hero.appendChild(particleContainer);
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            const size = Math.random() * 6 + 2;
+            const startX = Math.random() * 100;
+            const startY = Math.random() * 100;
+            const color = Math.random() > 0.5 ? '#272860' : '#f8e800';
+
+            particle.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                border-radius: 50%;
+                left: ${startX}%;
+                top: ${startY}%;
+                opacity: ${Math.random() * 0.3 + 0.2};
+                box-shadow: 0 0 ${size * 2}px ${color};
+            `;
+
+            particleContainer.appendChild(particle);
+
+            // Animate particle
+            const duration = 10 + Math.random() * 20;
+            const delay = Math.random() * 5;
+            const yMovement = -50 - Math.random() * 50;
+            const xMovement = (Math.random() - 0.5) * 30;
+
+            gsap.to(particle, {
+                y: `${yMovement}vh`,
+                x: `${xMovement}vw`,
+                opacity: 0,
+                duration: duration,
+                delay: delay,
+                repeat: -1,
+                ease: 'none',
+                onRepeat: () => {
+                    // Reset position
+                    gsap.set(particle, {
+                        y: 0,
+                        x: 0,
+                        opacity: Math.random() * 0.3 + 0.2
+                    });
+                }
+            });
+
+            // Add subtle rotation
+            gsap.to(particle, {
+                rotation: 360 * (Math.random() > 0.5 ? 1 : -1),
+                duration: duration,
+                repeat: -1,
+                ease: 'none'
+            });
+
+            // Add parallax effect to particles
+            hero.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+                const xPercent = (clientX / innerWidth - 0.5) * 2;
+                const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+                const depth = (i % 5 + 1) / 5;
+                gsap.to(particle, {
+                    x: `+=${xPercent * depth * 20}`,
+                    y: `+=${yPercent * depth * 20}`,
+                    duration: 0.5,
+                    ease: 'power2.out'
+                });
+            });
+        }
+    }
+
+    createHeroParticles();
+
+    // ================================
+    // HERO LIQUID BLOB ORBS
+    // ================================
+    function createGlowOrbs() {
+        const orbCount = 6;
+        for (let i = 0; i < orbCount; i++) {
+            const orb = document.createElement('div');
+            orb.className = `hero-glow-orb ${i % 2 === 0 ? 'primary' : 'secondary'}`;
+
+            const size = 250 + Math.random() * 350;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+
+            orb.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}%;
+                top: ${y}%;
+                animation-delay: ${i * -1.6}s;
+            `;
+
+            hero.appendChild(orb);
+
+            // Create morphing blob animation
+            const morphTimeline = gsap.timeline({ repeat: -1 });
+
+            // Generate random blob shapes
+            const shapes = [
+                '60% 40% 30% 70% / 60% 30% 70% 40%',
+                '30% 60% 70% 40% / 50% 60% 30% 60%',
+                '50% 50% 50% 50% / 50% 50% 50% 50%',
+                '70% 30% 50% 50% / 30% 50% 50% 60%',
+                '40% 60% 60% 40% / 60% 40% 60% 40%'
+            ];
+
+            shapes.forEach((shape, index) => {
+                morphTimeline.to(orb, {
+                    borderRadius: shape,
+                    duration: 4,
+                    ease: 'sine.inOut'
+                }, index * 4);
+            });
+
+            // Floating animation with rotation
+            gsap.to(orb, {
+                x: `+=${(Math.random() - 0.5) * 300}`,
+                y: `+=${(Math.random() - 0.5) * 300}`,
+                rotation: 360,
+                duration: 20 + Math.random() * 15,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            // Scale pulsing
+            gsap.to(orb, {
+                scale: 0.9 + Math.random() * 0.3,
+                duration: 5 + Math.random() * 3,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            });
+
+            // Mouse parallax for orbs with liquid feel
+            hero.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+                const xPercent = (clientX / innerWidth - 0.5) * 2;
+                const yPercent = (clientY / innerHeight - 0.5) * 2;
+
+                const depth = (i + 1) / orbCount;
+                gsap.to(orb, {
+                    x: `+=${xPercent * depth * 50}`,
+                    y: `+=${yPercent * depth * 50}`,
+                    duration: 1.2,
+                    ease: 'power1.out'
+                });
+            });
+        }
+    }
+
+    createGlowOrbs();
 }
 
 // ================================
@@ -1113,7 +1317,984 @@ if (document.querySelector('.scroll-indicator')) {
 }
 
 // ================================
+// DIMENSIONAL PORTAL & REALITY-BENDING EFFECTS
+// ================================
+
+// Portal opening effect when entering featured work section
+if (document.querySelector('.featured-work-section')) {
+    const featuredSection = document.querySelector('.featured-work-section');
+
+    ScrollTrigger.create({
+        trigger: featuredSection,
+        start: 'top 80%',
+        onEnter: () => {
+            featuredSection.classList.add('portal-active');
+            setTimeout(() => {
+                featuredSection.classList.add('grid-active');
+            }, 500);
+        },
+        onLeaveBack: () => {
+            featuredSection.classList.remove('portal-active', 'grid-active');
+        }
+    });
+}
+
+// ================================
+// EXPLOSIVE CIRCULAR REVEAL
+// ================================
+
+// Create particles for explosion effect
+function createExplosionParticles(element) {
+    const particleCount = 30;
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'explosion-particle';
+        particle.style.cssText = `
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: ${i % 2 === 0 ? '#f8e800' : '#272860'};
+            border-radius: 50%;
+            left: ${centerX}px;
+            top: ${centerY}px;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 20px currentColor;
+        `;
+        document.body.appendChild(particle);
+
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 200 + Math.random() * 200;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        gsap.to(particle, {
+            x: tx,
+            y: ty,
+            opacity: 0,
+            scale: 0,
+            rotation: Math.random() * 720,
+            duration: 1 + Math.random() * 0.5,
+            ease: 'power3.out',
+            onComplete: () => particle.remove()
+        });
+    }
+}
+
+// ================================
+// FEATURED WORK ANIMATIONS
+// ================================
+
+// ================================
+// VARIED REVEAL ANIMATIONS FOR EACH PROJECT
+// ================================
+
+// Animate featured projects on scroll with DIFFERENT animations
+gsap.utils.toArray('.featured-project').forEach((project, index) => {
+    const media = project.querySelector('.project-media');
+    const content = project.querySelector('.project-content');
+    const number = project.querySelector('.project-number');
+    const category = project.querySelector('.project-category');
+    const title = project.querySelector('.project-title');
+    const description = project.querySelector('.project-description');
+    const stats = project.querySelectorAll('.stat-box');
+    const cta = project.querySelector('.project-cta');
+    const bgImage = project.querySelector('.project-bg-image');
+
+    // Different reveal animations based on index
+    const revealPatterns = [
+        // Pattern 1: Diagonal wipe
+        () => {
+            gsap.from(project, {
+                clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+                duration: 1.5,
+                ease: 'power4.inOut',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        },
+        // Pattern 2: Split from center
+        () => {
+            gsap.from(project, {
+                clipPath: 'polygon(50% 0, 50% 0, 50% 100%, 50% 100%)',
+                duration: 1.2,
+                ease: 'expo.out',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        },
+        // Pattern 3: Curtain reveal
+        () => {
+            gsap.from(project, {
+                clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
+                duration: 1.3,
+                ease: 'power3.inOut',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 70%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        }
+    ];
+
+    // Apply pattern based on index
+    revealPatterns[index % revealPatterns.length]();
+
+    // Explosion effect for first project only
+    if (index === 0) {
+        ScrollTrigger.create({
+            trigger: project,
+            start: 'top 70%',
+            onEnter: () => {
+                project.classList.add('explode');
+                setTimeout(() => {
+                    createExplosionParticles(project);
+                }, 200);
+                setTimeout(() => {
+                    project.classList.remove('explode');
+                }, 1200);
+            },
+            once: true
+        });
+    }
+
+    // Create VARIED content animation timelines based on project index
+    const contentAnimations = [
+        // Animation 1: Spiral in
+        (tl) => {
+            tl.from(media, {
+                scale: 0.5,
+                rotation: -180,
+                opacity: 0,
+                duration: 1.5,
+                ease: 'back.out(1.7)'
+            }, 0);
+
+            tl.from([number, category, title, description], {
+                rotation: 90,
+                x: -100,
+                opacity: 0,
+                duration: 1,
+                stagger: {
+                    each: 0.1,
+                    from: 'end'
+                },
+                ease: 'expo.out'
+            }, 0.5);
+        },
+        // Animation 2: Wave reveal
+        (tl) => {
+            tl.from(media, {
+                clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+                duration: 1.2,
+                ease: 'power4.inOut'
+            }, 0);
+
+            tl.from([number, category, title, description], {
+                y: 100,
+                rotationX: -90,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: 'back.out(2)'
+            }, 0.6);
+        },
+        // Animation 3: Bounce in
+        (tl) => {
+            tl.from(media, {
+                y: -200,
+                opacity: 0,
+                duration: 1.2,
+                ease: 'bounce.out'
+            }, 0);
+
+            tl.from([number, category, title, description], {
+                scale: 0,
+                rotation: 360,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'elastic.out(1, 0.5)'
+            }, 0.4);
+        }
+    ];
+
+    // Create timeline
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: project,
+            start: 'top 80%',
+            end: 'top 20%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+
+    // Apply animation pattern
+    contentAnimations[index % contentAnimations.length](tl);
+
+    // Animate stats with varied patterns
+    const statAnimations = [
+        { y: -50, opacity: 0, rotation: -45 },
+        { scale: 0, opacity: 0, rotation: 180 },
+        { x: -100, opacity: 0, skewX: 20 }
+    ];
+
+    tl.from(stats, {
+        ...statAnimations[index % statAnimations.length],
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'back.out(2)'
+    }, 0.8);
+
+    // Animate CTA with unique effect per project
+    const ctaEffects = [
+        { scale: 0, rotation: 720, opacity: 0 },
+        { y: 100, opacity: 0, rotationX: 90 },
+        { scaleX: 0, opacity: 0, skewY: 10 }
+    ];
+
+    tl.from(cta, {
+        ...ctaEffects[index % ctaEffects.length],
+        duration: 0.8,
+        ease: 'back.out(2)'
+    }, 1);
+
+    // Parallax effect on image
+    gsap.to(bgImage, {
+        y: 100,
+        scrollTrigger: {
+            trigger: project,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1
+        }
+    });
+
+    // 3D tilt on mouse move
+    project.addEventListener('mousemove', (e) => {
+        const rect = project.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = (y - centerY) / 50;
+        const rotateY = (centerX - x) / 50;
+
+        gsap.to(content, {
+            duration: 0.5,
+            rotationX: rotateX,
+            rotationY: rotateY,
+            transformPerspective: 1000,
+            ease: 'power2.out'
+        });
+    });
+
+    project.addEventListener('mouseleave', () => {
+        gsap.to(content, {
+            duration: 0.8,
+            rotationX: 0,
+            rotationY: 0,
+            ease: 'elastic.out(1, 0.3)'
+        });
+    });
+
+    // Color shift on scroll through project
+    gsap.to(project, {
+        scrollTrigger: {
+            trigger: project,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1,
+            onUpdate: (self) => {
+                const progress = self.progress;
+                const hue = 220 + progress * 60; // Shift from blue to yellow
+                const saturation = 40 + progress * 60;
+                const lightness = 95 - progress * 10;
+                project.style.filter = `hue-rotate(${progress * 30}deg) saturate(${1 + progress * 0.2})`;
+            }
+        }
+    });
+
+    // Floating particles on hover
+    project.addEventListener('mouseenter', () => {
+        createFloatingParticles(project);
+    });
+});
+
+// ================================
+// FLOATING PARTICLE SYSTEM
+// ================================
+
+function createFloatingParticles(container) {
+    const particleCount = 15;
+    const rect = container.getBoundingClientRect();
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            width: ${4 + Math.random() * 6}px;
+            height: ${4 + Math.random() * 6}px;
+            background: ${Math.random() > 0.5 ? '#f8e800' : '#272860'};
+            border-radius: 50%;
+            left: ${rect.left + Math.random() * rect.width}px;
+            top: ${rect.top + Math.random() * rect.height}px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.7;
+            box-shadow: 0 0 10px currentColor;
+        `;
+        document.body.appendChild(particle);
+
+        gsap.to(particle, {
+            y: -200 - Math.random() * 200,
+            x: (Math.random() - 0.5) * 200,
+            opacity: 0,
+            scale: 0,
+            rotation: Math.random() * 360,
+            duration: 2 + Math.random() * 2,
+            ease: 'power1.out',
+            onComplete: () => particle.remove()
+        });
+    }
+}
+
+// ================================
+// REALITY WARP ON SECTION TRANSITIONS
+// ================================
+
+gsap.utils.toArray('.featured-project').forEach((project, index) => {
+    if (index === 0) return; // Skip first project
+
+    ScrollTrigger.create({
+        trigger: project,
+        start: 'top center',
+        end: 'center center',
+        scrub: 2,
+        onUpdate: (self) => {
+            const progress = self.progress;
+
+            // Warp previous sections
+            const allProjects = gsap.utils.toArray('.featured-project');
+            allProjects.slice(0, index).forEach((prevProject, i) => {
+                gsap.to(prevProject, {
+                    scale: 1 - progress * 0.1,
+                    rotationX: progress * -10,
+                    z: -progress * 200,
+                    opacity: 1 - progress * 0.5,
+                    filter: `blur(${progress * 5}px) brightness(${1 - progress * 0.3})`,
+                    duration: 0.3
+                });
+            });
+        }
+    });
+});
+
+// Stat value counter animation
+gsap.utils.toArray('.stat-box').forEach(stat => {
+    const valueElement = stat.querySelector('.stat-value');
+    const text = valueElement.textContent;
+
+    // Extract number from text (handles 300%, 10x, 2.5M, etc.)
+    const match = text.match(/[\d.]+/);
+    if (match) {
+        const number = parseFloat(match[0]);
+        const suffix = text.replace(/[\d.]+/, '');
+
+        ScrollTrigger.create({
+            trigger: stat,
+            start: 'top 80%',
+            onEnter: () => {
+                gsap.from({ val: 0 }, {
+                    val: number,
+                    duration: 2,
+                    ease: 'power2.out',
+                    onUpdate: function() {
+                        const currentVal = this.targets()[0].val;
+                        const formatted = number % 1 === 0
+                            ? Math.ceil(currentVal)
+                            : currentVal.toFixed(1);
+                        valueElement.textContent = formatted + suffix;
+                    }
+                });
+            },
+            once: true
+        });
+    }
+});
+
+// ================================
+// HORIZONTAL SCROLL ANIMATIONS
+// ================================
+
+if (document.querySelector('.horizontal-projects')) {
+    const horizontalSection = document.querySelector('.horizontal-scroll-section');
+    const horizontalProjects = document.querySelector('.horizontal-projects');
+    const hProjects = gsap.utils.toArray('.h-project');
+
+    // Animate horizontal scroll on vertical scroll
+    gsap.to(horizontalProjects, {
+        x: () => -(horizontalProjects.scrollWidth - window.innerWidth + 100),
+        ease: 'none',
+        scrollTrigger: {
+            trigger: horizontalSection,
+            start: 'top top',
+            end: () => `+=${horizontalProjects.scrollWidth}`,
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+        }
+    });
+
+    // Animate each project on entrance
+    hProjects.forEach((project, index) => {
+        gsap.from(project, {
+            scale: 0.8,
+            opacity: 0,
+            rotationY: -45,
+            duration: 0.8,
+            scrollTrigger: {
+                trigger: horizontalSection,
+                start: 'top center',
+                toggleActions: 'play none none reverse'
+            },
+            delay: index * 0.1
+        });
+
+        // 3D hover effect
+        project.addEventListener('mouseenter', () => {
+            gsap.to(project, {
+                z: 50,
+                rotationY: 10,
+                rotationX: 5,
+                duration: 0.4,
+                ease: 'power2.out'
+            });
+        });
+
+        project.addEventListener('mouseleave', () => {
+            gsap.to(project, {
+                z: 0,
+                rotationY: 0,
+                rotationX: 0,
+                duration: 0.6,
+                ease: 'elastic.out(1, 0.5)'
+            });
+        });
+    });
+}
+
+// ================================
+// PROJECT CTA ANIMATIONS
+// ================================
+
+document.querySelectorAll('.project-cta').forEach(button => {
+    // Pulse animation
+    gsap.to(button, {
+        scale: 1.05,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+    });
+
+    // Enhanced hover effect
+    button.addEventListener('mouseenter', () => {
+        gsap.to(button, {
+            scale: 1.1,
+            boxShadow: '0 30px 60px rgba(39, 40, 96, 0.4)',
+            duration: 0.3
+        });
+    });
+
+    button.addEventListener('mouseleave', () => {
+        gsap.to(button, {
+            scale: 1,
+            boxShadow: '0 10px 30px rgba(39, 40, 96, 0.2)',
+            duration: 0.3
+        });
+    });
+
+    // Click animation
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // Create ripple effect
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+        ripple.style.pointerEvents = 'none';
+
+        button.appendChild(ripple);
+
+        gsap.to(ripple, {
+            scale: 4,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power2.out',
+            onComplete: () => ripple.remove()
+        });
+    });
+});
+
+// ================================
+// PROJECT NUMBER PARALLAX
+// ================================
+
+gsap.utils.toArray('.project-number').forEach(number => {
+    gsap.to(number, {
+        y: -50,
+        opacity: 0.1,
+        scrollTrigger: {
+            trigger: number,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1
+        }
+    });
+});
+
+// ================================
+// ENHANCED PORTFOLIO GRID ANIMATIONS
+// ================================
+
+// Re-animate portfolio items with more dramatic effects
+gsap.utils.toArray('.portfolio-item').forEach((item, index) => {
+    const image = item.querySelector('.portfolio-image');
+    const info = item.querySelector('.portfolio-info');
+
+    // Entrance animation
+    gsap.from(item, {
+        y: 100,
+        rotationX: -30,
+        opacity: 0,
+        duration: 1,
+        scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        },
+        delay: (index % 3) * 0.1
+    });
+
+    // Image reveal animation
+    gsap.from(image, {
+        scale: 1.2,
+        duration: 1.5,
+        scrollTrigger: {
+            trigger: item,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+
+    // 3D hover effect
+    item.addEventListener('mouseenter', () => {
+        gsap.to(item, {
+            z: 60,
+            rotationY: 8,
+            rotationX: 5,
+            scale: 1.05,
+            duration: 0.5,
+            ease: 'power3.out'
+        });
+
+        gsap.to(image, {
+            scale: 1.1,
+            duration: 0.6
+        });
+    });
+
+    item.addEventListener('mouseleave', () => {
+        gsap.to(item, {
+            z: 0,
+            rotationY: 0,
+            rotationX: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: 'elastic.out(1, 0.5)'
+        });
+
+        gsap.to(image, {
+            scale: 1,
+            duration: 0.6
+        });
+    });
+});
+
+// ================================
+// MAGNETIC EFFECT FOR PROJECT CARDS
+// ================================
+
+gsap.utils.toArray('.featured-project').forEach(project => {
+    const cta = project.querySelector('.project-cta');
+
+    project.addEventListener('mousemove', (e) => {
+        const rect = cta.getBoundingClientRect();
+        const ctaCenterX = rect.left + rect.width / 2;
+        const ctaCenterY = rect.top + rect.height / 2;
+
+        const distance = Math.sqrt(
+            Math.pow(e.clientX - ctaCenterX, 2) +
+            Math.pow(e.clientY - ctaCenterY, 2)
+        );
+
+        if (distance < 150) {
+            const angle = Math.atan2(e.clientY - ctaCenterY, e.clientX - ctaCenterX);
+            const pullStrength = (150 - distance) / 150;
+            const moveX = Math.cos(angle) * pullStrength * 20;
+            const moveY = Math.sin(angle) * pullStrength * 20;
+
+            gsap.to(cta, {
+                x: moveX,
+                y: moveY,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
+        }
+    });
+
+    project.addEventListener('mouseleave', () => {
+        gsap.to(cta, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: 'elastic.out(1, 0.5)'
+        });
+    });
+});
+
+// ================================
+// LIQUID WAVE DISTORTION ON HORIZONTAL SCROLL
+// ================================
+
+if (document.querySelector('.horizontal-projects')) {
+    const hProjects = gsap.utils.toArray('.h-project');
+
+    hProjects.forEach((project, index) => {
+        // Wave effect on scroll reveal
+        ScrollTrigger.create({
+            trigger: project,
+            start: 'left right',
+            end: 'right left',
+            horizontal: true,
+            onEnter: () => {
+                gsap.from(project, {
+                    scaleY: 0.8,
+                    scaleX: 1.1,
+                    skewX: 5,
+                    duration: 0.8,
+                    ease: 'elastic.out(1, 0.5)'
+                });
+
+                // Ripple effect
+                const ripple = document.createElement('div');
+                ripple.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 20px;
+                    height: 20px;
+                    background: radial-gradient(circle, #f8e800, transparent);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    pointer-events: none;
+                `;
+                project.appendChild(ripple);
+
+                gsap.to(ripple, {
+                    width: 400,
+                    height: 400,
+                    opacity: 0,
+                    duration: 1.5,
+                    ease: 'power2.out',
+                    onComplete: () => ripple.remove()
+                });
+            }
+        });
+    });
+}
+
+// ================================
+// DIMENSIONAL SHIFT ON PAGE HERO
+// ================================
+
+if (document.querySelector('.page-hero')) {
+    const pageHero = document.querySelector('.page-hero');
+
+    // Create dimension shift effect
+    ScrollTrigger.create({
+        trigger: pageHero,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1,
+        onUpdate: (self) => {
+            const progress = self.progress;
+            pageHero.style.transform = `
+                perspective(1000px)
+                rotateX(${progress * 10}deg)
+                scale(${1 - progress * 0.1})
+            `;
+            pageHero.style.filter = `brightness(${1 - progress * 0.3})`;
+        }
+    });
+}
+
+// ================================
+// BREATHING EFFECT ON ENTIRE PAGE
+// ================================
+
+gsap.to('body', {
+    '--breath-scale': 1.002,
+    duration: 4,
+    repeat: -1,
+    yoyo: true,
+    ease: 'sine.inOut'
+});
+
+// ================================
+// STAR FIELD BACKGROUND
+// ================================
+
+function createStarField() {
+    const starField = document.createElement('div');
+    starField.className = 'star-field';
+    starField.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.3;
+    `;
+
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.style.cssText = `
+            position: absolute;
+            width: ${1 + Math.random() * 2}px;
+            height: ${1 + Math.random() * 2}px;
+            background: ${Math.random() > 0.5 ? '#f8e800' : '#272860'};
+            border-radius: 50%;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            opacity: ${Math.random() * 0.5 + 0.3};
+            animation: twinkle ${2 + Math.random() * 3}s ease-in-out infinite;
+        `;
+        starField.appendChild(star);
+    }
+
+    // Add twinkle animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    document.body.insertBefore(starField, document.body.firstChild);
+
+    // Parallax effect for stars
+    window.addEventListener('mousemove', (e) => {
+        const stars = starField.querySelectorAll('div');
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+
+        stars.forEach((star, index) => {
+            const depth = (index % 5 + 1) / 5;
+            gsap.to(star, {
+                x: x * depth,
+                y: y * depth,
+                duration: 0.5
+            });
+        });
+    });
+}
+
+createStarField();
+
+// ================================
+// ENERGY WAVES ON SCROLL
+// ================================
+
+let lastScrollY = window.scrollY;
+window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+    const scrollSpeed = Math.abs(currentScrollY - lastScrollY);
+
+    if (scrollSpeed > 10) {
+        // Create energy wave
+        const wave = document.createElement('div');
+        wave.style.cssText = `
+            position: fixed;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #f8e800, transparent);
+            pointer-events: none;
+            z-index: 9997;
+            top: 50%;
+        `;
+        document.body.appendChild(wave);
+
+        gsap.fromTo(wave,
+            { scaleX: 0, opacity: 1 },
+            {
+                scaleX: 1,
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power2.out',
+                onComplete: () => wave.remove()
+            }
+        );
+    }
+
+    lastScrollY = currentScrollY;
+});
+
+// ================================
+// TYPEWRITER EFFECT FOR TITLES
+// ================================
+gsap.utils.toArray('.project-title').forEach((title, index) => {
+    const text = title.textContent;
+    title.textContent = '';
+
+    ScrollTrigger.create({
+        trigger: title,
+        start: 'top 80%',
+        onEnter: () => {
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < text.length) {
+                    title.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 30 + index * 10);
+        },
+        once: true
+    });
+});
+
+// ================================
+// GLITCH EFFECT ON NUMBERS
+// ================================
+gsap.utils.toArray('.project-number').forEach((number, index) => {
+    ScrollTrigger.create({
+        trigger: number,
+        start: 'top 85%',
+        onEnter: () => {
+            // Glitch animation
+            const glitchTl = gsap.timeline();
+            for (let i = 0; i < 5; i++) {
+                glitchTl.to(number, {
+                    x: gsap.utils.random(-10, 10),
+                    y: gsap.utils.random(-10, 10),
+                    opacity: gsap.utils.random(0.3, 1),
+                    duration: 0.05
+                });
+            }
+            glitchTl.to(number, {
+                x: 0,
+                y: 0,
+                opacity: 0.3,
+                duration: 0.2
+            });
+        },
+        once: true
+    });
+});
+
+// ================================
+// BOUNCING STATS REVEAL
+// ================================
+gsap.utils.toArray('.stat-box').forEach((stat, index) => {
+    gsap.from(stat, {
+        y: -100 + gsap.utils.random(-50, 50),
+        rotation: gsap.utils.random(-360, 360),
+        opacity: 0,
+        duration: 1 + index * 0.1,
+        ease: 'bounce.out',
+        scrollTrigger: {
+            trigger: stat,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+        },
+        delay: index * 0.15
+    });
+});
+
+// ================================
+// SECTION TRANSITION WIPES
+// ================================
+gsap.utils.toArray('.section').forEach((section, index) => {
+    // Different wipe patterns for each section
+    const wipePatterns = [
+        'polygon(0 0, 100% 0, 100% 100%, 0 100%)', // Full
+        'polygon(0 0, 0 0, 0 100%, 0 100%)',        // Left wipe
+        'polygon(0 0, 100% 0, 100% 0, 0 0)',        // Top wipe
+        'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)' // Right wipe
+    ];
+
+    gsap.from(section, {
+        clipPath: wipePatterns[(index + 1) % wipePatterns.length],
+        duration: 1.2,
+        ease: 'power3.inOut',
+        scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            toggleActions: 'play none none reverse'
+        }
+    });
+});
+
+// ================================
+// MORPHING SHAPES
+// ================================
+if (document.querySelector('.floating-shapes')) {
+    gsap.to('.shape-1', {
+        morphSVG: 'circle',
+        scale: gsap.utils.wrap([1, 1.5, 0.8]),
+        duration: 8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+    });
+}
+
+// ================================
 // Console message
 // ================================
-console.log('%c🎨 OMENA - Creative Agency', 'color: #272860; font-size: 20px; font-weight: bold;');
-console.log('%cWebsite built with GSAP 3D animations', 'color: #666; font-size: 12px;');
+console.log('%c🌌 OMENA - Unique Animation Showcase', 'color: #272860; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px #f8e800;');
+console.log('%c✨ Each section has DIFFERENT animations!', 'color: #f8e800; font-size: 14px; font-weight: bold;');
+console.log('%c🎭 Diagonal wipes, spirals, waves, bounces & more', 'color: #272860; font-size: 12px;');
+console.log('%c⚡ Typewriter effects, glitches & morphing shapes', 'color: #f8e800; font-size: 12px;');
+console.log('%c🎨 Asymmetric layouts & reality-bending transitions', 'color: #272860; font-size: 12px; font-weight: bold;');
